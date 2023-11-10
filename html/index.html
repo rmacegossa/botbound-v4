@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>IA Build</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+    />
+    <style>
+      .doc {
+        overflow-x: scroll;
+      }
+      .doc::-webkit-scrollbar {
+        -webkit-appearance: none;
+        width: 7px;
+      }
+
+      .doc::-webkit-scrollbar-thumb {
+        border-radius: 4px;
+        background-color: rgba(0, 0, 0, 0.5);
+        box-shadow: 0 0 1px rgba(255, 255, 255, 0.5);
+      }
+
+      footer{
+        margin-top:50px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div style="height: 30px; width: 100%"></div>
+        <div class="col-md-12">
+          <div id="app">
+            <div class="text-center"><img src="https://res.cloudinary.com/dcjk537fm/image/upload/v1699468454/IA_BUild_3_bw2deo.png" alt="Logo" style="margin-bottom: 50px;max-width:100%;" /></div>
+            <div class="status">
+              <div class="alert alert-danger" role="alert" style="display:flex;">
+                <div class="spinner-border" role="status" style="width:25px;height:25px;">
+                  <span class="sr-only">Loading...</span>
+                </div>
+                <p style="margin:0;margin-left:15px;">Conectando, por favor espere...</p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-8" style="padding-top: 20px">
+                <textarea
+                cols="30"
+                rows="10"
+                class="form-control logs"
+                ></textarea>
+                <p style="font-size:12px;color: red; margin-top:10px;" id="qrcodemessage"><b>O Qrcode aparecerá ao lado após o carregamento, aguarde...</b></p>
+              </div>
+              <div class="col-md-4">
+                <div class="text-center">
+                  <img
+                    src="http://ajaxloadingimages.net/gif/image?imageid=simplebar&forecolor=000000&backcolor=ffffff"
+                    alt="QR Code"
+                    id="qrcode"
+                    style="width: 100%"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- <div style="height: 30px; width: 100%"></div>
+        <div class="col-md-12">
+          <h1>Documentação</h1>
+          <div class="row doc">
+            <div class="col-md-12">
+              <label>Enviar mensagem</label>
+              <input
+                type="text"
+                readonly
+                value="/send-message"
+                class="form-control"
+              />
+              <div style="height: 20px; width: 100%"></div>
+              <div class="table-responsive">
+                <table class="table">
+                  <tbody>
+                    <tr>
+                      <td>Method</td>
+                      <td>POST</td>
+                    </tr>
+                    <tr>
+                      <td>Body</td>
+                      <td>
+                        <table>
+                          <thead>
+                            <tr>
+                              <th>Key</th>
+                              <th>Type</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td>number</td>
+                              <td>string</td>
+                            </tr>
+                            <tr>
+                              <td>message</td>
+                              <td>string</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div> -->
+    </div>
+    <footer>
+      <hr />
+      <p>Copyright© 2023 IA Build - Todos os direitos reservados.</p>
+    </footer>
+
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        var socket = io();
+        $("#qrcode").hide();
+
+        socket.on("message", function (msg) {
+          $(".logs").append(msg + "&#13;&#10;");
+          if (!(msg == "Conectando..." || msg == "Whatsapp está pronto!")) {
+            $(".status")
+              .empty()
+              .append(
+                '<div class="alert alert-success" role="alert">\n' + msg + "</div>"
+              );
+          }
+        });
+
+        socket.on("qr", function (src) {
+          $(".status")
+            .empty()
+            .append(
+              '<div class="alert alert-info" role="alert">\n' +
+                " Scaneie o QR Code aqui:" +
+                "</div>"
+            );
+          $("#qrcode").attr("src", src);
+          $("#qrcodemessage").hide();
+          $("#qrcode").show();
+        });
+
+        socket.on("ready", function (data) {
+          $("#qrcode").hide();
+          $(".status")
+            .empty()
+            .append(
+              '<div class="alert alert-success" role="alert">\n' +
+                " Whatsapp está pronto!" +
+                "</div>"
+            );
+        });
+
+        socket.on("authenticated", function (data) {
+          $("#qrcode").hide();
+        });
+      });
+    </script>
+  </body>
+</html>
