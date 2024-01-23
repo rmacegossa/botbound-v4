@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Envio de Mensagem com Imagem</title>
+</head>
+<body>
+    <h1>Teste de Envio de Mensagem com Imagem</h1>
+    
+    <form id="messageForm" enctype="multipart/form-data">
+        <!-- Mantenha o campo para números separados por vírgula -->
+        <label for="numbers">Números (separados por vírgula):</label>
+        <input type="text" id="numbers" name="numbers" required>
+        <br>
+
+        <!-- Adicione o campo para upload de arquivo CSV (opcional) -->
+        <label for="csvFile">Enviar arquivo CSV (opcional):</label>
+        <input type="file" id="csvFile" name="csvFile">
+        <br>
+
+        <label for="message">Mensagem:</label>
+        <textarea id="message" name="message" required></textarea>
+        <br>
+
+        <label for="image">Caminho da Imagem:</label>
+        <input type="text" id="image" name="image" required>
+        <br>
+
+        <button type="button" onclick="sendMessage()">Enviar Mensagem com Imagem</button>
+    </form>
+
+    <script>
+         function phoneNumberFormatter(number) {
+    // Implemente a lógica de formatação, se necessário
+    return number;
+  }
+   async function sendMessage() {
+    // Obtenha os valores dos campos
+    const numbersValue = document.getElementById('numbers').value;
+    const messageValue = document.getElementById('message').value;
+    const imageValue = document.getElementById('image').value;
+
+    // Obtenha o arquivo CSV, se fornecido
+    const csvFile = document.getElementById('csvFile').files[0];
+
+    // Se há um arquivo CSV, leia o conteúdo usando FileReader
+    if (csvFile) {
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+            const numbersFromCSV = e.target.result.split('\n').map(number => phoneNumberFormatter(number.trim()));
+            processMessages(numbersFromCSV, messageValue, imageValue);
+        };
+
+        reader.readAsText(csvFile);
+    } else {
+        // Se não houver arquivo CSV, processe os números do campo de texto diretamente
+        const numbersFromTextArea = numbersValue.split(',').map(number => phoneNumberFormatter(number.trim()));
+        processMessages(numbersFromTextArea, messageValue, imageValue);
+    }
+}
+
+async function processMessages(numbers, message, image) {
+    // Crie um objeto FormData para enviar dados do formulário
+    const formData = new FormData();
+    formData.append('numbers', JSON.stringify(numbers));
+    formData.append('message', message);
+    formData.append('image', image);
+
+    // Adicione o arquivo CSV ao FormData, se fornecido
+    const csvFile = document.getElementById('csvFile').files[0];
+    if (csvFile) {
+        formData.append('csvFile', csvFile);
+    }
+
+    // Adicione o token ao header
+    const headers = {
+        "Authorization": "Bearer *!/0?;&okyE[)G4z;Zi},~VkS#~JO0QR",
+    };
+
+    // Use o método fetch para enviar a requisição POST
+    const response = await fetch("/send-message-with-csv", {
+        method: "POST",
+        headers: headers,
+        body: formData,
+    });
+
+    const result = await response.json();
+    console.log('Server Response:', result);
+}
+    </script>
+    
+</body>
+</html>
